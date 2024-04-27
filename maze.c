@@ -95,6 +95,7 @@ int get_width(FILE *file)
     int firstWidth = 0;
     int i = 0;
 
+    //find the length of the first line
     fgets(line_buffer, buffer_size, file);
     while(line_buffer[i] != '\n'){
         i+=1;
@@ -104,9 +105,6 @@ int get_width(FILE *file)
         }
     }
     firstWidth = i;
-
-        
-       
     
     //validate width
     if (firstWidth > 100 || firstWidth < 5){
@@ -152,11 +150,7 @@ int get_height(FILE *file)
  */
 int read_maze(maze *this, FILE *file)
 {
-     if (file == NULL) {
-        printf("Error: Could not find or open file\n");
-        return 1;
-    } 
-
+    //get dimensions
     int height = get_height(file);
     (*this).height = height;
     int width = get_width(file);
@@ -171,18 +165,23 @@ int read_maze(maze *this, FILE *file)
     char line_buffer[buffer_size];
     int i = 0;
     fseek(file, 0, SEEK_SET);
+
     while (fgets(line_buffer, buffer_size, file) != NULL) {
         for (int j = 0; j < width; j+=1){
             (*this).map[i][j] = line_buffer[j];
         }
         i+=1;
     }
+    
+    //close the file
     fclose(file);
-    //locate and position S and E
+
     int foundS = 0;
     int foundE = 0;
     for (i = 0; i < height; i+=1){
         for (int j = 0; j < width; j+=1){
+            
+            //check for multiple start/end points
             if ((*this).map[i][j] == 83 && foundS == 1){
                 printf("Error: Multiple start points S\n");
                 return 1;
@@ -191,6 +190,7 @@ int read_maze(maze *this, FILE *file)
                 return 1;
             }
 
+            //locate and position start and end
             if (foundS == 0 || foundE == 0){
                 if ((*this).map[i][j] == 83){
                     (*this).start.x=j;
@@ -202,6 +202,7 @@ int read_maze(maze *this, FILE *file)
                     foundE = 1;
                 }
             }
+           
             //testing for illegal characters
             if ((*this).map[i][j] != 83){
                 if ((*this).map[i][j] != 69){
@@ -218,6 +219,7 @@ int read_maze(maze *this, FILE *file)
         }
     }
     
+    //produce error if there is a missing start/end
     if (foundS == 0){
         printf("Error: No start point S\n");
         return 1;
@@ -225,6 +227,7 @@ int read_maze(maze *this, FILE *file)
         printf("Error: No end point E\n");
         return 1;
     }
+
     printf("File loaded successfully\n");
     return 0;
 }
@@ -270,6 +273,7 @@ void move(maze *this, coord *player, char direction)
     int invalid = 0;
     coord newCoord = *player;
 
+    //validate direction
     if (direction == 'w'){
         newCoord.y-=1;
     } else if (direction == 'm'){
@@ -351,6 +355,7 @@ int main(int argc, char *argv[])
         printf("Usage: maze <filename> <width> <height>");
         return(1);
     } else {
+        //ensure entered dimensions are ints between 5 and 100
         width = is_digit(argv[2]);
         height = is_digit(argv[3]);
         if (width == 1 || height == 1){
@@ -363,15 +368,28 @@ int main(int argc, char *argv[])
     maze *this_maze = malloc(sizeof(maze));
     FILE *f;
 
+    //initialize maze object
     if (create_maze(this_maze, width, height) == 1){
-        return 1;
+        return 3;
     }
+
+    //open the file and ensure it exists
     f = fopen(argv[1], "r");
+    if (f == NULL) {
+        printf("Error: Could not find or open file\n");
+        return 2;
+    } 
+
+    //read in the maze, any errors exit with code 3 (maze error)
     if (read_maze(this_maze, f) == 1){
-        return 1;
+        return 3;
     }
+
+    //initialize player position
     (*player).x = (*this_maze).start.x;
     (*player).y = (*this_maze).start.y;
+    
+    //start game loop
     char direction;
     while (has_won(this_maze, player) == 0){
         printf("Make your move... \n");
@@ -380,6 +398,7 @@ int main(int argc, char *argv[])
         move(this_maze, player, direction);
     }
 
+    //free space
     free(this_maze);
     return 0;
 }
