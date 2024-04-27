@@ -94,15 +94,18 @@ int get_width(FILE *file)
     int firstWidth = 0;
     int i = 0;
 
-    while (fgets(line_buffer, buffer_size, file) !=NULL){
-        while(line_buffer[i] != '\n'){
-            i+=1;
-        }
-        if (firstWidth == 0){
-            firstWidth = i;
+    fgets(line_buffer, buffer_size, file);
+    while(line_buffer[i] != '\n'){
+        i+=1;
+        if (i > 100){
+            printf("Error: Invalid width");
+            return 1;
         }
     }
-
+    firstWidth = i;
+        
+       
+    
     //validate width
     if (firstWidth > 100 || firstWidth < 5){
         printf("Error: Invalid width\n");
@@ -263,7 +266,7 @@ void print_maze(maze *this, coord *player)
 void move(maze *this, coord *player, char direction)
 {
     int invalid = 0;
-    coord newCoord = *player;
+    coord newCoord;
     newCoord.x = (*player).x;
     newCoord.y = (*player).y;
     
@@ -278,16 +281,16 @@ void move(maze *this, coord *player, char direction)
     } else if (direction == 97){
         newCoord.x-=1;
     } else {
-        printf("Invalid move entry");
+        printf("Error 1: invalid input\n");
         invalid = 1;
     }
 
     //ensure move stays within the bounds
     if (newCoord.y < 0 || newCoord.y > 100){
-        printf("Invalid move entry");
+        printf("Error 2: invalid input\n");
         invalid = 1;
     } else if (newCoord.x < 0 || newCoord.x > 100){
-        printf("Invalid move entry");
+        printf("Error 3: invalid input\n");
         invalid = 1;
     } 
 
@@ -297,7 +300,7 @@ void move(maze *this, coord *player, char direction)
             (*player).x = newCoord.x;
             (*player).y = newCoord.y;
         } else {
-            printf("Invalid move entry");
+            printf("Error 4: invalid input\n");
         }
     }
 }

@@ -139,7 +139,7 @@ fi
 
 echo -n "Testing valid maze - "
 
-./maze mazes/easy1.txt 16 11 > tmp
+./maze mazes/easy1.txt 16 11 < inputs/easy1Solve.txt > tmp
 
 if grep -q "File loaded successfully" tmp;
 then
@@ -158,7 +158,7 @@ echo -n "Testing invalid input (9) - "
 
 ./maze mazes/easy1.txt 16 11 < inputs/invalid1.txt > tmp
 
-if grep -q "Error: Maze file is impossible to solve" tmp;
+if grep -q "Error: invalid input" tmp;
 then
     echo "PASS"
 else
