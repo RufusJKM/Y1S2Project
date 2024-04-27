@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 // defines for max and min permitted dimensions
 #define MAX_DIM 100
@@ -97,12 +98,13 @@ int get_width(FILE *file)
     fgets(line_buffer, buffer_size, file);
     while(line_buffer[i] != '\n'){
         i+=1;
-        if (i > 100){
-            printf("Error: Invalid width");
+        if (i > 100){  
+            printf("Error: Invalid width\n");
             return 1;
         }
     }
     firstWidth = i;
+
         
        
     
@@ -217,13 +219,13 @@ int read_maze(maze *this, FILE *file)
     }
     
     if (foundS == 0){
-        printf("Error: No start point S");
+        printf("Error: No start point S\n");
         return 1;
     } else if (foundE == 0){
-        printf("Error: No end point E");
+        printf("Error: No end point E\n");
         return 1;
     }
-    printf("File loaded successfully");
+    printf("File loaded successfully\n");
     return 0;
 }
 
@@ -266,41 +268,39 @@ void print_maze(maze *this, coord *player)
 void move(maze *this, coord *player, char direction)
 {
     int invalid = 0;
-    coord newCoord;
-    newCoord.x = (*player).x;
-    newCoord.y = (*player).y;
-    
-    if (direction == 119){
-        newCoord.y+=1;
-    } else if (direction == 109){
-        print_maze(this, player);
-    } else if (direction == 115){
+    coord newCoord = *player;
+
+    if (direction == 'w'){
         newCoord.y-=1;
-    } else if (direction == 100){
+    } else if (direction == 'm'){
+        print_maze(this, player);
+    } else if (direction == 's'){
+        newCoord.y+=1;
+    } else if (direction == 'd'){
         newCoord.x+=1;
-    } else if (direction == 97){
+    } else if (direction == 'a'){
         newCoord.x-=1;
     } else {
-        printf("Error 1: invalid input\n");
+        printf("Error: invalid input\n");
         invalid = 1;
     }
 
     //ensure move stays within the bounds
-    if (newCoord.y < 0 || newCoord.y > 100){
-        printf("Error 2: invalid input\n");
+    if (newCoord.y < 0 || newCoord.y >= (*this).height){
+        printf("Error: out of bounds\n");
         invalid = 1;
-    } else if (newCoord.x < 0 || newCoord.x > 100){
-        printf("Error 3: invalid input\n");
+    } else if (newCoord.x < 0 || newCoord.x >= (*this).width){
+        printf("Error: out of bounds\n");
         invalid = 1;
     } 
 
     //ensure player doesnt move into wall
     if (invalid == 0){
-        if ((*this).map[newCoord.x][newCoord.y] != 35) {
+        if ((*this).map[newCoord.y][newCoord.x] != '#') {
             (*player).x = newCoord.x;
             (*player).y = newCoord.y;
         } else {
-            printf("Error 4: invalid input\n");
+            printf("Error: you hit a wall\n");
         }
     }
 }
@@ -316,7 +316,7 @@ int has_won(maze *this, coord *player)
 {
     if ((*this).end.x == (*player).x){
         if ((*this).end.y == (*player).y){
-            printf("Congratulations, you win!");
+            printf("Congratulations, you solved the maze!\n");
             return 1;
         } else {
             return 0;
@@ -372,10 +372,11 @@ int main(int argc, char *argv[])
     }
     (*player).x = (*this_maze).start.x;
     (*player).y = (*this_maze).start.y;
+    char direction;
     while (has_won(this_maze, player) == 0){
-        char direction = ' ';
-        printf("Make your move... ");
-        scanf("%c", &direction);
+        printf("Make your move... \n");
+        scanf(" %c", &direction);
+        direction = tolower(direction);
         move(this_maze, player, direction);
     }
 

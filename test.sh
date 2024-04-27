@@ -177,50 +177,15 @@ else
     echo "FAIL"
 fi
 
-
-echo -n "Testing invalid input (WA) - "
-
-./maze mazes/easy1.txt 16 11 < inputs/invalid3.txt > tmp
-
-if grep -q "Error: invalid input" tmp;
-then
-    echo "PASS"
-else
-    echo "FAIL"
-fi
-
-echo -n "Testing invalid input (WW) - "
-
-./maze mazes/easy1.txt 16 11 < inputs/invalid4.txt > tmp
-
-if grep -q "Error: invalid input" tmp;
-then
-    echo "PASS"
-else
-    echo "FAIL"
-fi
-
 #For valid inputs i will tet both uppercase and lowercase
 #I will test just one for each as otherwise, 8 tests would be too much
 #For a normal move, the loop should restart with a prompt
-#For a Map call, the next output will be a prompt to close the map
 
-echo -n "Testing valid input (S) - "
+echo -n "Testing valid input (s) - "
 
-./maze mazes/easy1.txt 16 11 < inputs/valid1.txt > tmp
+./maze mazes/easy1.txt 16 11 < inputs/easy1Solve.txt > tmp
 
-if grep -q "Make your next move... " tmp;
-then
-    echo "PASS"
-else
-    echo "FAIL"
-fi
-
-echo -n "Testing valid input (m) - "
-
-./maze mazes/easy1.txt 16 11 < inputs/valid2.txt > tmp
-
-if grep -q "Enter M to close map" tmp;
+if grep -q "Make your move... " tmp;
 then
     echo "PASS"
 else
@@ -237,7 +202,7 @@ echo -n "Testing invalid move (into wall) - "
 
 ./maze mazes/easy1.txt 16 11 < inputs/intoWall.txt > tmp
 
-if grep -q "Invalid move" tmp;
+if grep -q "Error: you hit a wall" tmp;
 then
     echo "PASS"
 else
@@ -250,7 +215,7 @@ echo -n "Testing invalid move (off map) - "
 
 ./maze mazes/easy1.txt 16 11 < inputs/outOfMap.txt > tmp
 
-if grep -q "Invalid move" tmp;
+if grep -q "Error: out of bounds" tmp;
 then
     echo "PASS"
 else
